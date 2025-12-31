@@ -1,6 +1,6 @@
-# Mis Buenos Presagios
+# Fullstack-Web-App
 
-Aplicación web que muestra frases categorizadas (Magic, Lucky, Naughty) con reglas diarias de uso.
+Aplicación web que muestra frases categorizadas con reglas diarias de uso.
 El frontend consume un backend serverless conectado a PostgreSQL.
 
 La app funciona:
