@@ -14,7 +14,7 @@ export default function Magic() {
   const [mostrarTrebol, setMostrarTrebol] = useState(false)
   const [trebolTipo, setTrebolTipo] = useState<TrebolTipo | null>(null)
 
-  // Referencia al audio
+  
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const config = {
@@ -35,7 +35,6 @@ export default function Magic() {
       audioRef.current = new Audio('/sonidos/magic.mp3')
       audioRef.current.volume = 0.3
     }
-
     audioRef.current.currentTime = 0
     audioRef.current.play().catch(() => {})
   }
@@ -49,8 +48,6 @@ export default function Magic() {
 
   const cargarMensaje = async () => {
     setLoading(true)
-
-    // empieza el sonido cuando arranca la carga
     reproducirSonido()
 
     const result = await getDailyContent(config, async () => {
@@ -76,17 +73,12 @@ export default function Magic() {
       setTimeout(() => {
         setTexto(null)
         setMostrarTrebol(true)
-
-        // cortamos el sonido
         detenerSonido()
-
         setTimeout(() => setMostrarTrebol(false), 10000)
       }, 3000)
     } else if (result.data) {
       setTexto(result.data.message)
       setLocked(false)
-
-      // cortamos el sonido cuando aparece el mensaje real
       setTimeout(detenerSonido, 2500)
     }
 
@@ -95,8 +87,6 @@ export default function Magic() {
 
   useEffect(() => {
     setTexto('El bosque guarda silencio…')
-
-    // sonido inicial
     reproducirSonido()
 
     const timer = setTimeout(cargarMensaje, 2000)
@@ -125,7 +115,11 @@ export default function Magic() {
 
       {mostrarTrebol && trebolTipo && (
         <div className="fade-text" style={{ marginTop: '2rem' }}>
-          <img src={`/imagenes/trebol-${trebolTipo}.png`} style={{ width: '160px' }} />
+          <img
+            src={`/imagenes/trebol-${trebolTipo}.png`}
+            alt={`Trébol de ${trebolTipo} hojas`}
+            style={{ width: '160px' }}
+          />
           <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>
             Has encontrado un trébol de {trebolTipo} hojas
           </p>
@@ -138,6 +132,7 @@ export default function Magic() {
     </div>
   )
 }
+
 
 
 
