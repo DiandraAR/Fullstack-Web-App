@@ -88,7 +88,7 @@ export default function Magic() {
     const hoy = new Date().toDateString()
     const guardado = localStorage.getItem('trebol-magic')
 
-    // 🔒 YA USADO HOY → solo música + trébol
+    // YA USADO HOY → solo música + trébol
     if (guardado && JSON.parse(guardado).date === hoy) {
       const tipo = JSON.parse(guardado).tipo
       reproducirSonido()
@@ -99,7 +99,7 @@ export default function Magic() {
       return
     }
 
-    // 🔮 RITUAL NORMAL
+    // RITUAL NORMAL
     setTexto('El bosque guarda silencio…')
     reproducirSonido()
 

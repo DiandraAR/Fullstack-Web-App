@@ -41,7 +41,7 @@ export default function Lucky() {
       getRandomByCategory('lucky')
     )
 
-    // 🔒 YA NO HAY MÁS AUGURIOS
+    // YA NO HAY MÁS AUGURIOS
     if (result.locked) {
       detenerSonido()
       setTexto(result.message || null)
@@ -50,7 +50,7 @@ export default function Lucky() {
       return
     }
 
-    // 🌿 AÚN HAY AUGURIO → ahora sí ritual
+    // AÚN HAY AUGURIO → ahora sí ritual
     setTexto('Un duende leyó las hojas…')
     reproducirSonido()
 
