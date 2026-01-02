@@ -6,9 +6,18 @@ export default function Home() {
     <div className="home-container">
       <h1 className="home-title">Mis Buenos Presagios</h1>
 
-      <p className="home-subtitle">
-      It's lucky season
-      </p>
+      {/* 👇 CONTENEDOR DEL SUBTÍTULO */}
+      <div className="home-subtitle-wrapper">
+        <img
+          src="/imagenes/duende.png"   // 👈 tu imagen en /public/imagenes
+          alt="Duende"
+          className="home-duende"
+        />
+
+        <p className="home-subtitle">
+          It's lucky season
+        </p>
+      </div>
 
       <div className="home-buttons">
         <Link to="/magic">

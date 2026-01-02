@@ -14,7 +14,6 @@ export default function Magic() {
   const [mostrarTrebol, setMostrarTrebol] = useState(false)
   const [trebolTipo, setTrebolTipo] = useState<TrebolTipo | null>(null)
 
-  
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const config = {
@@ -34,6 +33,7 @@ export default function Magic() {
     if (!audioRef.current) {
       audioRef.current = new Audio('/sonidos/magic.mp3')
       audioRef.current.volume = 0.3
+      audioRef.current.loop = false
     }
     audioRef.current.currentTime = 0
     audioRef.current.play().catch(() => {})
@@ -48,7 +48,6 @@ export default function Magic() {
 
   const cargarMensaje = async () => {
     setLoading(true)
-    reproducirSonido()
 
     const result = await getDailyContent(config, async () => {
       const res = await fetch('/api/magic')
@@ -62,38 +61,54 @@ export default function Magic() {
       const hoy = new Date().toDateString()
       const guardado = localStorage.getItem('trebol-magic')
 
+      let tipo: TrebolTipo
       if (!guardado || JSON.parse(guardado).date !== hoy) {
-        const tipo = elegirTrebol()
+        tipo = elegirTrebol()
         localStorage.setItem('trebol-magic', JSON.stringify({ date: hoy, tipo }))
-        setTrebolTipo(tipo)
       } else {
-        setTrebolTipo(JSON.parse(guardado).tipo)
+        tipo = JSON.parse(guardado).tipo
       }
+
+      detenerSonido()
 
       setTimeout(() => {
         setTexto(null)
+        setTrebolTipo(tipo)
         setMostrarTrebol(true)
-        detenerSonido()
-        setTimeout(() => setMostrarTrebol(false), 10000)
       }, 3000)
     } else if (result.data) {
       setTexto(result.data.message)
       setLocked(false)
-      setTimeout(detenerSonido, 2500)
     }
 
     setLoading(false)
   }
 
   useEffect(() => {
+    const hoy = new Date().toDateString()
+    const guardado = localStorage.getItem('trebol-magic')
+
+    // 🔒 YA USADO HOY → solo música + trébol
+    if (guardado && JSON.parse(guardado).date === hoy) {
+      const tipo = JSON.parse(guardado).tipo
+      reproducirSonido()
+      setTrebolTipo(tipo)
+      setMostrarTrebol(true)
+      setLocked(true)
+      setLoading(false)
+      return
+    }
+
+    // 🔮 RITUAL NORMAL
     setTexto('El bosque guarda silencio…')
     reproducirSonido()
 
-    const timer = setTimeout(cargarMensaje, 2000)
+    const timer = setTimeout(() => {
+      cargarMensaje()
+    }, 4000)
 
     return () => {
       clearTimeout(timer)
-      detenerSonido()
     }
   }, [])
 
@@ -132,6 +147,11 @@ export default function Magic() {
     </div>
   )
 }
+
+
+
+
+
 
 
 

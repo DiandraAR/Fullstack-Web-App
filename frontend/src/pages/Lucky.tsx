@@ -10,7 +10,7 @@ export default function Lucky() {
 
   const [texto, setTexto] = useState<string | null>(null)
   const [locked, setLocked] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const config = {
     key: 'lucky',
@@ -18,7 +18,7 @@ export default function Lucky() {
     emptyMessage: 'Las señales se aquietaron.',
   }
 
-  const playSound = () => {
+  const reproducirSonido = () => {
     if (!audioRef.current) {
       audioRef.current = new Audio('/sonidos/lucky.mp3')
       audioRef.current.volume = 0.3
@@ -27,42 +27,46 @@ export default function Lucky() {
     audioRef.current.play().catch(() => {})
   }
 
-  const stopSound = () => {
+  const detenerSonido = () => {
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.currentTime = 0
     }
   }
 
-  const cargar = async () => {
-    stopSound()
+  const lanzarAugurio = async () => {
     setLoading(true)
-    setTexto('Un duende leyó las hojas…')
-    playSound()
 
     const result = await getDailyContent(config, () =>
       getRandomByCategory('lucky')
     )
 
+    // 🔒 YA NO HAY MÁS AUGURIOS
     if (result.locked) {
+      detenerSonido()
       setTexto(result.message || null)
       setLocked(true)
-    } else {
-      setTexto(result.data?.message || null)
-      setLocked(false)
+      setLoading(false)
+      return
     }
 
-    // cortamos el sonido cuando el mensaje ya está visible
-    setTimeout(stopSound, 2000)
+    // 🌿 AÚN HAY AUGURIO → ahora sí ritual
+    setTexto('Un duende leyó las hojas…')
+    reproducirSonido()
 
-    setLoading(false)
+    setTimeout(() => {
+      setTexto(result.data?.message || null)
+      setLocked(false)
+      setLoading(false)
+    }, 3000)
   }
 
+  // Primer augurio al entrar
   useEffect(() => {
-    const timer = setTimeout(cargar, 2500)
+    lanzarAugurio()
+
     return () => {
-      clearTimeout(timer)
-      stopSound()
+      detenerSonido()
     }
   }, [])
 
@@ -77,7 +81,7 @@ export default function Lucky() {
       )}
 
       {!locked && !loading && (
-        <button className="page-button" onClick={cargar}>
+        <button className="page-button" onClick={lanzarAugurio}>
           Otra señal
         </button>
       )}
@@ -88,6 +92,13 @@ export default function Lucky() {
     </div>
   )
 }
+
+
+
+
+
+
+
 
 
 

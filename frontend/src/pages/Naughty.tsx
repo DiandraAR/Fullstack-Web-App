@@ -10,7 +10,7 @@ export default function Naughty() {
 
   const [texto, setTexto] = useState<string | null>(null)
   const [locked, setLocked] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const config = {
     key: 'naughty',
@@ -18,7 +18,7 @@ export default function Naughty() {
     emptyMessage: 'El duende sonríe, pero ya no dice más.',
   }
 
-  const playSound = () => {
+  const reproducirSonido = () => {
     if (!audioRef.current) {
       audioRef.current = new Audio('/sonidos/naughty.mp3')
       audioRef.current.volume = 0.3
@@ -27,42 +27,49 @@ export default function Naughty() {
     audioRef.current.play().catch(() => {})
   }
 
-  const stopSound = () => {
+  const detenerSonido = () => {
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.currentTime = 0
     }
   }
 
-  const cargar = async () => {
-    stopSound()
+  const lanzarSusurro = async () => {
     setLoading(true)
+
+    // Texto titilando inicial
     setTexto('Se oye una risa baja…')
-    playSound()
 
     const result = await getDailyContent(config, () =>
       getRandomByCategory('naughty')
     )
 
+    // Si ya no hay más susurros → NO música
     if (result.locked) {
       setTexto(result.message || null)
       setLocked(true)
-    } else {
-      setTexto(result.data?.message || null)
-      setLocked(false)
+      setLoading(false)
+      return
     }
 
-    // sonido se corta cuando el mensaje ya salió
-    setTimeout(stopSound, 1800)
+    
+    reproducirSonido()
 
-    setLoading(false)
+    
+    setTimeout(() => {
+      setTexto(result.data?.message || null)
+      setLocked(false)
+      setLoading(false)
+      // NO detenemos el audio aquí (igual que Lucky)
+    }, 1500)
   }
 
+  // Primer susurro al entrar
   useEffect(() => {
-    const timer = setTimeout(cargar, 1800)
+    lanzarSusurro()
+
     return () => {
-      clearTimeout(timer)
-      stopSound()
+      detenerSonido()
     }
   }, [])
 
@@ -77,7 +84,7 @@ export default function Naughty() {
       )}
 
       {!locked && !loading && (
-        <button className="page-button" onClick={cargar}>
+        <button className="page-button" onClick={lanzarSusurro}>
           Otro susurro
         </button>
       )}
@@ -88,6 +95,7 @@ export default function Naughty() {
     </div>
   )
 }
+
 
 
 
